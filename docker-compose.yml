@@ -1,0 +1,123 @@
+version: "3.9" 
+services:
+  main:
+    extra_hosts:
+      host.docker.internal:host-gateway
+    depends_on:
+      - rabbitmq
+      - db
+      - mongodb
+    image: r0xff/core_main:alpha
+    links:
+      - rabbitmq
+      - mysql_service
+    ports:
+      - "51820:51820/udp"
+      - "80:80"
+    volumes:
+      - ./core/app:/var/www/html/app
+      - ./core/bootstrap:/var/www/html/bootstrap
+      - ./core/config:/var/www/html/config
+      - ./core/database:/var/www/html/database
+      - ./core/lang:/var/www/html/lang
+      - ./core/public:/var/www/html/public
+      - ./core/resources:/var/www/html/resources
+      - ./core/routes:/var/www/html/routes
+      - ./core/storage:/var/www/html/storage
+      - ./core/test:/var/www/html/test
+      - ./core/.env:/var/www/html/.env
+      - ./core/composer.json:/var/www/html/composer.json
+      - ./core/composer.lock:/var/www/html/composer.lock
+      - ./core/package.json:/var/www/html/package.json
+      - ./wireguard:/etc/wireguard
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./core_py:/root/core_py
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0
+      - net.ipv4.conf.all.src_valid_mark=1
+    restart: always
+
+  db:
+    image: mysql:5.7
+    depends_on:
+      - rabbitmq
+    volumes:
+      - ./mysql:/var/lib/mysql
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=5$$C0Re$$5
+      - MYSQL_DATABASE=core
+      - MYSQL_USER=core
+      - MYSQL_PASSWORD=5$$C0Re$$5
+
+  mongodb:
+    image: mongo:5.0
+    depends_on:
+      - db
+    ports:
+      - 27018:27017
+    volumes:
+      - ./mongo:/data/db
+    restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=citizix
+      - MONGO_INITDB_ROOT_PASSWORD=S3cret
+
+  rabbitmq:
+    image: r0xff/core_rabbitmq:alpha
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+      - "15674:15674"
+    # volumes:
+    #   - ./rabbitmq/data:/var/lib/rabbitmq
+    #   - ./rabbitmq/log:/var/log/rabbitmq
+
+  mysql_service:
+    image: r0xff/core_mysql_service:alpha
+    restart: always
+    volumes:
+      - ./mysql_service/data:/var/lib/mysql
+      - ./mysql_service/wireguard:/etc/wireguard
+    environment:
+      - MYSQL_ROOT_PASSWORD=5$$C0Re$$5
+      - MYSQL_USER=core
+      - MYSQL_PASSWORD=5$$C0Re$$5
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0
+      - net.ipv4.conf.all.src_valid_mark=1
+
+  phpmyadmin_service:
+    image: r0xff/core_phpmyadmin_service:alpha
+    depends_on:
+      - mysql_service
+    restart: always
+    ports:
+      - "8080:8080"
+    links: 
+      - mysql_service
+    volumes:
+      - ./phpmyadmin_service/wireguard:/etc/wireguard
+    environment:
+      - PMA_HOST=mysql_service
+      - PMA_PORT=3306
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0
+      - net.ipv4.conf.all.src_valid_mark=1
+
+
+
+      
+
+
+    

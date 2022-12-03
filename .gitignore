@@ -1,0 +1,11 @@
+#core folder
+/core/node_modules
+/core/vendor
+/core/.idea
+/core/.vscode
+
+#main folder
+/main/core/node_modules
+/main/core/vendor
+/main/core/.idea
+/main/core/.vscode

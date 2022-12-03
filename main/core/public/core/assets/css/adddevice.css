@@ -1,0 +1,4 @@
+.add-device-form:focus{
+    border-color:  var(--white-color) !important;
+    box-shadow: unset !important;
+}

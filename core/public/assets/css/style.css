@@ -1,0 +1,8 @@
+/* pointer */
+.pointer {
+    cursor: pointer;
+}
+.disabled-cu {
+    cursor: not-allowed !important;
+}
+/* pointer */
