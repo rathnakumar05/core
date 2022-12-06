@@ -1,0 +1,36 @@
+FROM ubuntu:latest
+
+RUN apt update && apt install tzdata -y
+ENV TZ="Asia/Kolkata"
+
+RUN apt-get install -y software-properties-common iptables curl iproute2 ifupdown iputils-ping sudo wireguard openssh-server net-tools 
+RUN echo resolvconf resolvconf/linkify-resolvconf boolean false | debconf-set-selections 
+RUN echo "REPORT_ABSENT_SYMLINK=no" >> /etc/default/resolvconf 
+RUN apt-get install resolvconf
+
+RUN apt-get update -y
+
+RUN mkdir /var/run/sshd
+
+# RUN echo 'root:root' |chpasswd
+
+# RUN sed -ri 's/^#?PermitRootLogin\s+.*/PermitRootLogin yes/' /etc/ssh/sshd_config
+# RUN sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config
+
+# RUN mkdir /root/.ssh
+
+RUN apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+COPY ./docker-entrypoint.sh docker-entrypoint.sh
+
+RUN chmod +x ./docker-entrypoint.sh
+
+RUN sed -i -e 's/\r$//' ./docker-entrypoint.sh 
+
+ENTRYPOINT [ "./docker-entrypoint.sh" ]
+
+
+
+
+
