@@ -1,8 +1,5 @@
 #core folder
-/core/node_modules
-/core/vendor
-/core/.idea
-/core/.vscode
+/core
 
 #main folder
 /main/core/node_modules
